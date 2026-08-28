@@ -1,0 +1,256 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../js/**/*.js';
+
+@theme {
+    --font-sans: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+        'Courier New', monospace;
+    --color-gray-700: #2f3131;
+    --color-gray-800: #202222;
+    --color-gray-900: #191A1A;
+    --color-gray-950: #101111;
+}
+
+/* Dark mode custom properties */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Dark mode auto remap common light utilities */
+.dark {
+    --tw-ring-color: var(--color-gray-800);
+    color-scheme: dark;
+}
+
+.dark body {
+    background-color: #191A1A;
+    color: #f3f4f6;
+}
+
+/* Backgrounds */
+.dark .bg-white {
+    background-color: #202222;
+}
+
+.dark .bg-gray-50 {
+    background-color: #191A1A;
+}
+
+.dark .bg-gray-100 {
+    background-color: #2F3030;
+}
+
+.dark .bg-gray-200 {
+    background-color: #3F4040;
+}
+
+.dark .bg-gray-950 {
+    background-color: #000000;
+}
+
+/* Text colors */
+.dark .text-gray-900 {
+    color: #ffffff;
+}
+
+.dark .text-gray-800 {
+    color: #e5e5e5;
+}
+
+.dark .text-gray-700 {
+    color: #d4d4d4;
+}
+
+.dark .text-gray-600 {
+    color: #a3a3a3;
+}
+
+.dark .text-gray-500 {
+    color: #737373;
+}
+
+.dark .text-gray-400 {
+    color: #525252;
+}
+
+/* Form elements */
+.dark input,
+.dark textarea,
+.dark select {
+    background-color: #0a0a0a;
+    border-color: #262626;
+    color: #f3f4f6;
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+    border-color: #404040;
+    outline-color: #404040;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+    color: #525252;
+}
+
+/* Borders */
+.dark .border-gray-100 {
+    border-color: #2F3030;
+}
+
+.dark .border-gray-200 {
+    border-color: #2F3030;
+}
+
+.dark .border-gray-300 {
+    border-color: #3F4040;
+}
+
+.dark .border-white {
+    border-color: #262626;
+}
+
+/* Hover states */
+.dark .hover\:bg-gray-50:hover {
+    background-color: #2F3030;
+}
+
+.dark .hover\:bg-gray-100:hover {
+    background-color: #3F4040;
+}
+
+.dark .divide-gray-100 > * + * {
+    border-color: #2F3030;
+}
+
+.dark .border-b {
+    border-color: #2F3030;
+}
+
+.dark .border-t {
+    border-color: #2F3030;
+}
+
+.dark .border-l {
+    border-color: #2F3030;
+}
+
+.dark .border-r {
+    border-color: #2F3030;
+}
+
+/* Sidebar navigation */
+.dark .text-gray-300 {
+    color: #d4d4d4;
+}
+
+.dark .hover\:text-gray-900:hover {
+    color: #ffffff;
+}
+
+.dark .hover\:text-gray-600:hover {
+    color: #a3a3a3;
+}
+
+/* Cards and panels */
+.dark .shadow-sm {
+    --tw-shadow-color: #262626;
+}
+
+.dark .shadow {
+    --tw-shadow-color: #262626;
+}
+
+/* Tables */
+.dark table {
+    color: #f3f4f6;
+}
+
+.dark .divide-y > * + * {
+    border-color: #262626;
+}
+
+/* Custom scrollbar for dark mode */
+.dark ::-webkit-scrollbar-thumb {
+    background-color: #262626;
+}
+
+.dark ::-webkit-scrollbar-track {
+    background-color: #0a0a0a;
+}
+
+/* Typing indicator animation (chat) */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.typing-indicator span {
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background-color: #9ca3af;
+    animation: typing-bounce 1.2s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+@keyframes typing-bounce {
+    0%,
+    60%,
+    100% {
+        transform: translateY(0);
+        opacity: 0.4;
+    }
+    30% {
+        transform: translateY(-4px);
+        opacity: 1;
+    }
+}
+
+/* Markdown specific dark mode styles */
+.dark .markdown-content code {
+    background: linear-gradient(135deg, rgb(67, 56, 202) 0%, rgb(79, 70, 229) 100%);
+    color: rgb(243, 244, 246);
+    border-color: rgba(129, 140, 248, 0.3);
+}
+
+.dark .typing-indicator span {
+    background-color: rgb(209, 213, 219);
+}
+
+.dark .markdown-content strong {
+    color: #f9fafb;
+}
+
+.dark .markdown-content h1,
+.dark .markdown-content h2 {
+    border-bottom-color: #2F3030;
+}
+
+.dark .markdown-content blockquote {
+    background-color: #202222;
+    border-left-color: #4b5563;
+    color: #d1d5db;
+}
+
+.dark .markdown-content hr {
+    border-top-color: #2F3030;
+}
+
+.dark .markdown-content th {
+    background-color: #202222;
+}
+
+.dark .markdown-content th,
+.dark .markdown-content td {
+    border-color: #2F3030;
+}
