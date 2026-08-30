@@ -121,7 +121,8 @@ class AIHeartbeatService
      */
     public function getAllStatuses(): array
     {
-        $statuses = AIStatus::orderBy('model_name')->get();
+        $availableKeys = array_keys(config('services.ai.available_models', []));
+        $statuses = AIStatus::whereIn('model_name', $availableKeys)->orderBy('model_name')->get();
 
         return $statuses->map(function ($status) {
             return [

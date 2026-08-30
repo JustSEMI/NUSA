@@ -39,16 +39,16 @@ class DatabaseSeeder extends Seeder
         // 2. Seed AI Model Statuses
         $models = [
             [
-                'model_name' => 'grok-4.6',
+                'model_name' => 'qwen-3.8-flash',
                 'is_online' => true,
-                'response_time_ms' => 115,
+                'response_time_ms' => 75,
                 'last_check_at' => now(),
                 'last_error' => null,
             ],
             [
-                'model_name' => 'qwen-flash',
+                'model_name' => 'qwen-3.8-max',
                 'is_online' => true,
-                'response_time_ms' => 78,
+                'response_time_ms' => 95,
                 'last_check_at' => now(),
                 'last_error' => null,
             ],
@@ -63,13 +63,6 @@ class DatabaseSeeder extends Seeder
                 'model_name' => 'qwen-3.5-plus',
                 'is_online' => true,
                 'response_time_ms' => 125,
-                'last_check_at' => now(),
-                'last_error' => null,
-            ],
-            [
-                'model_name' => 'gemini-3.7-flash',
-                'is_online' => true,
-                'response_time_ms' => 105,
                 'last_check_at' => now(),
                 'last_error' => null,
             ],

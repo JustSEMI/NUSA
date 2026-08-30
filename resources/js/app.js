@@ -37,10 +37,17 @@ const CONFIG = {
         thinkingEffortMenu: "thinkingEffortMenu",
         thinkingEffortIcon: "thinkingEffortIcon",
         thinkingEffortText: "thinkingEffortText",
-        deleteChatBtn: "deleteChatBtn",
         attachmentPreviewTray: "attachmentPreviewTray",
         attachFileBtn: "attachFileBtn",
+        attachFileIcon: "attachFileIcon",
+        attachMenu: "attachMenu",
+        menuUploadFile: "menuUploadFile",
+        menuUploadPhoto: "menuUploadPhoto",
+        menuUploadCode: "menuUploadCode",
         fileInput: "fileInput",
+        fileInputDocument: "fileInputDocument",
+        fileInputImage: "fileInputImage",
+        fileInputCode: "fileInputCode",
         dragDropOverlay: "dragDropOverlay",
     },
 };
@@ -917,6 +924,17 @@ class ChatBot {
                     if (effortIcon) effortIcon.style.transform = "rotate(0deg)";
                 }
 
+                // Close attach menu if open
+                const attachMenu = this.ui.get("attachMenu");
+                const attachIcon = this.ui.get("attachFileIcon");
+                const attachBtn = this.ui.get("attachFileBtn");
+                if (attachMenu && !attachMenu.classList.contains("invisible")) {
+                    attachMenu.classList.add("invisible", "opacity-0", "translate-y-2", "pointer-events-none");
+                    attachMenu.classList.remove("visible", "opacity-100", "translate-y-0", "pointer-events-auto");
+                    if (attachBtn) attachBtn.setAttribute("aria-expanded", "false");
+                    if (attachIcon) attachIcon.style.transform = "rotate(0deg)";
+                }
+
                 dropdownMenu.classList.remove(
                     "invisible",
                     "opacity-0",
@@ -1018,6 +1036,17 @@ class ChatBot {
                     if (modelIcon) modelIcon.style.transform = "rotate(0deg)";
                 }
 
+                // Close attach menu if open
+                const attachMenu = this.ui.get("attachMenu");
+                const attachIcon = this.ui.get("attachFileIcon");
+                const attachBtn = this.ui.get("attachFileBtn");
+                if (attachMenu && !attachMenu.classList.contains("invisible")) {
+                    attachMenu.classList.add("invisible", "opacity-0", "translate-y-2", "pointer-events-none");
+                    attachMenu.classList.remove("visible", "opacity-100", "translate-y-0", "pointer-events-auto");
+                    if (attachBtn) attachBtn.setAttribute("aria-expanded", "false");
+                    if (attachIcon) attachIcon.style.transform = "rotate(0deg)";
+                }
+
                 dropdownMenu.classList.remove(
                     "invisible",
                     "opacity-0",
@@ -1097,12 +1126,128 @@ class ChatBot {
 
     setupAttachmentHandlers() {
         const attachBtn = this.ui.get("attachFileBtn");
-        const fileInput = this.ui.get("fileInput");
+        const attachIcon = this.ui.get("attachFileIcon") || (attachBtn ? attachBtn.querySelector("i, svg") : null);
+        const attachMenu = this.ui.get("attachMenu");
 
-        if (attachBtn && fileInput) {
+        const fileInput = this.ui.get("fileInput");
+        const fileInputDoc = this.ui.get("fileInputDocument") || fileInput;
+        const fileInputImg = this.ui.get("fileInputImage") || fileInput;
+        const fileInputCode = this.ui.get("fileInputCode") || fileInput;
+
+        const menuUploadFile = this.ui.get("menuUploadFile");
+        const menuUploadPhoto = this.ui.get("menuUploadPhoto");
+        const menuUploadCode = this.ui.get("menuUploadCode");
+
+        const closeAttachMenu = () => {
+            if (!attachMenu) return;
+            attachMenu.classList.add("invisible", "opacity-0", "translate-y-2", "pointer-events-none");
+            attachMenu.classList.remove("visible", "opacity-100", "translate-y-0", "pointer-events-auto");
+            if (attachBtn) {
+                attachBtn.setAttribute("aria-expanded", "false");
+            }
+            if (attachIcon) {
+                attachIcon.style.transform = "rotate(0deg)";
+            }
+        };
+
+        const openAttachMenu = () => {
+            if (!attachMenu) return;
+            // Close other dropdowns if open
+            const modelMenu = this.ui.get("modelDropdownMenu");
+            const modelIcon = this.ui.get("modelDropdownIcon");
+            if (modelMenu && !modelMenu.classList.contains("invisible")) {
+                modelMenu.classList.add("invisible", "opacity-0", "translate-y-2");
+                modelMenu.classList.remove("visible", "opacity-100", "translate-y-0");
+                if (modelIcon) modelIcon.style.transform = "rotate(0deg)";
+            }
+
+            const thinkingMenu = this.ui.get("thinkingEffortMenu");
+            const thinkingIcon = this.ui.get("thinkingEffortIcon");
+            if (thinkingMenu && !thinkingMenu.classList.contains("invisible")) {
+                thinkingMenu.classList.add("invisible", "opacity-0", "translate-y-2");
+                thinkingMenu.classList.remove("visible", "opacity-100", "translate-y-0");
+                if (thinkingIcon) thinkingIcon.style.transform = "rotate(0deg)";
+            }
+
+            attachMenu.classList.remove("invisible", "opacity-0", "translate-y-2", "pointer-events-none");
+            attachMenu.classList.add("visible", "opacity-100", "translate-y-0", "pointer-events-auto");
+            if (attachBtn) {
+                attachBtn.setAttribute("aria-expanded", "true");
+            }
+            if (attachIcon) {
+                attachIcon.style.transform = "rotate(45deg)";
+            }
+
+            setTimeout(() => {
+                if (typeof lucide !== "undefined") {
+                    lucide.createIcons();
+                }
+            }, 10);
+        };
+
+        if (attachBtn && attachMenu) {
+            attachBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const isOpen = !attachMenu.classList.contains("invisible");
+                if (isOpen) {
+                    closeAttachMenu();
+                } else {
+                    openAttachMenu();
+                }
+            });
+        } else if (attachBtn && fileInput) {
             attachBtn.addEventListener("click", () => fileInput.click());
-            fileInput.addEventListener("change", (e) => this.handleFileSelect(e));
         }
+
+        // Submenu button clicks
+        if (menuUploadFile && fileInputDoc) {
+            menuUploadFile.addEventListener("click", (e) => {
+                e.stopPropagation();
+                closeAttachMenu();
+                fileInputDoc.click();
+            });
+        }
+
+        if (menuUploadPhoto && fileInputImg) {
+            menuUploadPhoto.addEventListener("click", (e) => {
+                e.stopPropagation();
+                closeAttachMenu();
+                fileInputImg.click();
+            });
+        }
+
+        if (menuUploadCode && fileInputCode) {
+            menuUploadCode.addEventListener("click", (e) => {
+                e.stopPropagation();
+                closeAttachMenu();
+                fileInputCode.click();
+            });
+        }
+
+        // Bind change events to all file inputs
+        [fileInput, fileInputDoc, fileInputImg, fileInputCode].forEach((input) => {
+            if (input) {
+                input.addEventListener("change", (e) => this.handleFileSelect(e));
+            }
+        });
+
+        // Close on outside click
+        document.addEventListener("click", (e) => {
+            if (!attachMenu) return;
+            const isClickInside =
+                (attachBtn && attachBtn.contains(e.target)) ||
+                attachMenu.contains(e.target);
+            if (!isClickInside) {
+                closeAttachMenu();
+            }
+        });
+
+        // Close on escape key
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                closeAttachMenu();
+            }
+        });
 
         // Global Paste Listener (Ctrl+V / Cmd+V)
         window.addEventListener("paste", (e) => this.handlePaste(e));
@@ -1684,19 +1829,53 @@ class ChatBot {
     }
 
     async manualHeartbeat() {
+        const statusLoading = document.getElementById('statusLoading');
+        const statusContent = document.getElementById('statusContent');
+        const statusList = document.getElementById('statusList');
+
         const btn = event?.target?.closest("button");
+        let originalHTML = "";
         if (btn) {
-            const originalHTML = btn.innerHTML;
+            originalHTML = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML =
-                '<i data-lucide="loader" class="h-4 w-4 animate-spin"></i> Loading...';
+                '<i data-lucide="loader" class="h-4 w-4 animate-spin"></i> Memeriksa...';
             if (typeof lucide !== "undefined") lucide.createIcons();
+        }
 
-            try {
-                await this.loadStatusModal();
-            } catch (error) {
-                // Silent fail
-            } finally {
+        // Show loading stably while checking
+        if (statusLoading && statusContent) {
+            statusLoading.classList.remove('hidden');
+            statusContent.classList.add('hidden');
+        }
+
+        try {
+            // Trigger actual heartbeat check to update model statuses
+            await fetch('/api/ai/heartbeat', {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                }
+            });
+
+            // Fetch and render updated statuses
+            await this.loadStatusModal(false);
+        } catch (error) {
+            console.error('Failed to run heartbeat:', error);
+            if (statusLoading && statusContent && statusList) {
+                statusLoading.classList.add('hidden');
+                statusContent.classList.remove('hidden');
+                statusList.innerHTML = `
+                    <div class="text-center py-6">
+                        <i data-lucide="triangle-alert" class="h-8 w-8 text-amber-500 mx-auto mb-2"></i>
+                        <p class="text-sm font-medium text-gray-700 dark:text-gray-200">Gagal memperbarui status</p>
+                        <p class="text-xs text-gray-400 mt-1">${error.message || 'Periksa koneksi internet'}</p>
+                    </div>
+                `;
+                if (typeof lucide !== "undefined") lucide.createIcons();
+            }
+        } finally {
+            if (btn) {
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
                 if (typeof lucide !== "undefined") lucide.createIcons();
@@ -1704,7 +1883,7 @@ class ChatBot {
         }
     }
 
-    async loadStatusModal() {
+    async loadStatusModal(triggerHeartbeatIfEmpty = false) {
         const statusLoading = document.getElementById('statusLoading');
         const statusContent = document.getElementById('statusContent');
         const statusList = document.getElementById('statusList');
@@ -1714,12 +1893,12 @@ class ChatBot {
             return;
         }
 
-        // Show loading, hide content
+        // Show loading stably, hide content
         statusLoading.classList.remove('hidden');
         statusContent.classList.add('hidden');
 
         try {
-            const response = await fetch('/api/ai/status', {
+            let response = await fetch('/api/ai/status', {
                 headers: {
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
@@ -1730,67 +1909,62 @@ class ChatBot {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const result = await response.json();
-
+            let result = await response.json();
             if (!result.success) {
                 throw new Error(result.message || 'API returned success=false');
             }
 
-            const statuses = result.statuses || result.data || [];
+            let statuses = result.statuses || result.data || [];
 
-            // Check if we should auto-trigger heartbeat
-            const shouldRefresh = statuses.length === 0
-                || statuses.every(s => !s.is_online) // All offline
-                || statuses.some(s => {
-                    // Check if last_check_at indicates stale data (contains "hour" or "day")
-                    const lastCheck = s.last_check_at || '';
-                    return lastCheck.includes('hour') || lastCheck.includes('day') || lastCheck.includes('minute') && parseInt(lastCheck) > 5;
-                });
-
-            // Hide loading, show content
-            statusLoading.classList.add('hidden');
-            statusContent.classList.remove('hidden');
-
-            if (shouldRefresh) {
-                // Auto trigger heartbeat for stale/offline data
-                statusList.innerHTML = `
-                    <div class="text-center py-8">
-                        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-t-blue-500 mb-3"></div>
-                        <p class="text-sm text-gray-600">Memeriksa status AI...</p>
-                        <p class="text-xs text-gray-400 mt-2">Ini mungkin memakan waktu beberapa detik</p>
-                    </div>
-                `;
-
-                // Auto trigger heartbeat
-                const heartbeatResponse = await fetch('/api/ai/heartbeat', {
+            // If empty and allowed, trigger heartbeat once
+            if (statuses.length === 0 && triggerHeartbeatIfEmpty) {
+                await fetch('/api/ai/heartbeat', {
                     headers: {
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
                     }
                 });
-                await heartbeatResponse.json();
 
-                // Reload status after heartbeat
-                return await this.loadStatusModal();
+                response = await fetch('/api/ai/status', {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    }
+                });
+                result = await response.json();
+                statuses = result.statuses || result.data || [];
             }
 
-            // Display statuses
+            // Hide loading, show content once fully ready
+            statusLoading.classList.add('hidden');
+            statusContent.classList.remove('hidden');
+
+            if (statuses.length === 0) {
+                statusList.innerHTML = `
+                    <div class="text-center py-6 text-gray-500 dark:text-gray-400">
+                        <p class="text-sm">Belum ada data status AI.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Display statuses cleanly
             statusList.innerHTML = `
-                <div class="space-y-2 max-h-64 overflow-y-auto">
+                <div class="space-y-2 max-h-64 overflow-y-auto pr-1">
                     ${statuses.map(status => `
-                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                            <div class="flex items-center gap-3">
-                                <div class="flex items-center justify-center w-8 h-8 rounded-full ${status.is_online ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900'}">
-                                    <i data-lucide="${status.is_online ? 'check' : 'x'}" class="h-4 w-4 ${status.is_online ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}"></i>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#191A1A] border border-gray-100 dark:border-[#2F3030] rounded-xl transition-all">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-full shrink-0 ${status.is_online ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400' : 'bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400'}">
+                                    <i data-lucide="${status.is_online ? 'check' : 'x'}" class="h-4 w-4"></i>
                                 </div>
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900 dark:text-white">${status.display_name || status.model_name}</p>
-                                    ${status.last_check_at ? `<p class="text-xs text-gray-500 dark:text-gray-400">${status.last_check_at}</p>` : ''}
+                                <div class="min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white truncate">${status.display_name || status.model_name}</p>
+                                    ${status.last_check_at ? `<p class="text-[11px] text-gray-500 dark:text-gray-400">${status.last_check_at}</p>` : ''}
                                 </div>
                             </div>
-                            <div class="text-right">
-                                ${status.response_time_ms ? `<p class="text-xs font-medium text-gray-700 dark:text-gray-300">${status.response_time_ms}ms</p>` : ''}
-                                ${!status.is_online && status.last_error ? `<p class="text-xs text-red-500 truncate max-w-[150px]" title="${status.last_error}">Error</p>` : ''}
+                            <div class="text-right shrink-0 ml-2">
+                                ${status.response_time_ms ? `<p class="text-xs font-medium text-gray-700 dark:text-gray-300 font-mono">${status.response_time_ms}ms</p>` : ''}
+                                ${!status.is_online && status.last_error ? `<p class="text-[11px] text-red-500 truncate max-w-[130px]" title="${status.last_error}">Offline</p>` : ''}
                             </div>
                         </div>
                     `).join('')}
@@ -1809,9 +1983,9 @@ class ChatBot {
             statusList.innerHTML = `
                 <div class="text-center py-8">
                     <i data-lucide="triangle-alert" class="h-8 w-8 text-red-500 mx-auto mb-3"></i>
-                    <p class="text-sm text-gray-600 font-medium">Gagal memuat status AI</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 font-medium">Gagal memuat status AI</p>
                     <p class="text-xs text-gray-400 mt-1 mb-4">${error.message || 'Terjadi kesalahan'}</p>
-                    <button onclick="window.chatBot?.loadStatusModal()" class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+                    <button onclick="window.chatBot?.loadStatusModal(false)" class="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-medium rounded-lg hover:opacity-90 transition-colors">
                         Coba Lagi
                     </button>
                 </div>
