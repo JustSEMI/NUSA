@@ -5,15 +5,15 @@
 @section('styles')
 <style>
     /* Custom Dropdown Animation */
-    #modelDropdownMenu {
-        transform-origin: bottom center;
+    #modelDropdownMenu, #thinkingEffortMenu, #attachMenu {
+        transform-origin: bottom left;
     }
 
-    #modelDropdownMenu.invisible {
+    #modelDropdownMenu.invisible, #thinkingEffortMenu.invisible, #attachMenu.invisible {
         pointer-events: none;
     }
 
-    #modelDropdownMenu.visible {
+    #modelDropdownMenu.visible, #thinkingEffortMenu.visible, #attachMenu.visible {
         pointer-events: auto;
     }
 
@@ -524,27 +524,20 @@
                     <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-xl border border-gray-200 dark:border-[#2F3030] bg-white dark:bg-[#202222] shadow-sm">
                         <i data-lucide="message-square" class="h-7 w-7 text-gray-400 dark:text-gray-500"></i>
                     </div>
-                    <h3 class="mt-4 text-base sm:text-lg font-medium text-gray-900 dark:text-white">Halo, {{ auth()->user()->name ?? 'Pengguna' }}! 👋</h3>
-                    <p class="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">Tanya saya apa saja — ide, tulisan, kode, sampai obrolan santai.</p>
 
-                    <div class="mt-6 grid grid-cols-1 gap-2 sm:grid-cols-2 max-w-lg mx-auto">
-                        <button onclick="sendSuggestion('Buatkan caption Instagram untuk promo produk')"
-                                class="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-[#2F3030] bg-white dark:bg-[#202222] p-2.5 text-xs sm:text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2F3030] text-left transition">
-                            <i data-lucide="pen-line" class="h-4 w-4 text-gray-500 shrink-0"></i> <span>Bantu menulis caption</span>
-                        </button>
-                        <button onclick="sendSuggestion('Ide nama untuk startup kuliner nusantara')"
-                                class="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-[#2F3030] bg-white dark:bg-[#202222] p-2.5 text-xs sm:text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2F3030] text-left transition">
-                            <i data-lucide="lightbulb" class="h-4 w-4 text-gray-500 shrink-0"></i> <span>Beri ide startup</span>
-                        </button>
-                        <button onclick="sendSuggestion('Jelaskan cara kerja API seperti aku anak 12 tahun')"
-                                class="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-[#2F3030] bg-white dark:bg-[#202222] p-2.5 text-xs sm:text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2F3030] text-left transition">
-                            <i data-lucide="code" class="h-4 w-4 text-gray-500 shrink-0"></i> <span>Jelaskan konsep API</span>
-                        </button>
-                        <button onclick="sendSuggestion('Susun itinerary 3 hari 2 malam di Yogyakarta')"
-                                class="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-[#2F3030] bg-white dark:bg-[#202222] p-2.5 text-xs sm:text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2F3030] text-left transition">
-                            <i data-lucide="map" class="h-4 w-4 text-gray-500 shrink-0"></i> <span>Rencanakan liburan</span>
-                        </button>
-                    </div>
+                    @php
+                        $subtitles = [
+                            "Kamu bisa bertanya ke saya bebas apa saja.",
+                            "Ada yang bisa saya bantu untuk tugas atau proyekmu hari ini?",
+                            "Tanya apa saja — mulai dari ide kreatif, kode program, hingga analisis data.",
+                            "Siap membantu menyelesaikan masalahmu hari ini. Mau mulai dari mana?",
+                            "Butuh inspirasi, revisi kode, atau sekadar teman diskusi? Tanyakan saja!",
+                            "Ketik pertanyaan atau paste gambar dan file untuk mulai menganalisis.",
+                        ];
+                        $randomSubtitle = $subtitles[array_rand($subtitles)];
+                    @endphp
+                    <h3 class="mt-4 text-base sm:text-lg font-medium text-gray-900 dark:text-white">Halo, Selamat Datang {{ auth()->user()->name ?? 'Pengguna' }}! 👋</h3>
+                    <p class="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">{{ $randomSubtitle }}</p>
                 </div>
             </div>
 
@@ -630,15 +623,73 @@
                 </div>
 
                 <div class="flex gap-2 sm:gap-3 items-center">
-                    {{-- File Input & Paperclip Button --}}
+                    {{-- Hidden Specialized File Inputs --}}
                     <input type="file" id="fileInput" class="hidden" multiple accept="image/*,.pdf,.doc,.docx,.xlsx,.xls,.csv,.tsv,.json,.txt,.md,.markdown,.log,.html,.xml,.yaml,.yml,.sql,.php,.js,.jsx,.ts,.tsx,.vue,.py,.java,.c,.cpp,.h,.cs,.go,.rs,.rb,.sh,.bash,.ini,.conf,.env">
-                    
-                    <button type="button"
-                            id="attachFileBtn"
-                            class="rounded-lg text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#191A1A] border border-gray-300 dark:border-[#2F3030] bg-white dark:bg-[#191A1A] shrink-0 inline-flex items-center justify-center w-10 h-10 transition-all duration-150 active:scale-95 focus:outline-none"
-                            title="Lampirkan File / Gambar (atau paste langsung Ctrl+V)">
-                        <i data-lucide="paperclip" class="h-5 w-5"></i>
-                    </button>
+                    <input type="file" id="fileInputDocument" class="hidden" multiple accept=".pdf,.doc,.docx,.xlsx,.xls,.csv,.tsv,.json,.txt,.md,.markdown,.log,.html,.xml,.yaml,.yml">
+                    <input type="file" id="fileInputImage" class="hidden" multiple accept="image/*">
+                    <input type="file" id="fileInputCode" class="hidden" multiple accept=".js,.jsx,.ts,.tsx,.vue,.py,.php,.java,.c,.cpp,.h,.cs,.go,.rs,.rb,.sh,.bash,.sql,.html,.css,.json,.yaml,.yml,.env,.ini,.conf">
+
+                    {{-- Gemini-style Attachment Button & Dropdown --}}
+                    <div class="relative shrink-0">
+                        <button type="button"
+                                id="attachFileBtn"
+                                class="rounded-lg text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#282a2d] border border-gray-300 dark:border-[#383a3f] bg-white dark:bg-[#1e1f20] shrink-0 inline-flex items-center justify-center w-10 h-10 transition-all duration-200 active:scale-95 focus:outline-none"
+                                title="Masukkan file, foto, atau kode"
+                                aria-expanded="false"
+                                aria-haspopup="true">
+                            <i data-lucide="plus" id="attachFileIcon" class="h-5 w-5 transition-transform duration-200"></i>
+                        </button>
+
+                        {{-- Gemini Floating Attachment Menu --}}
+                        <div id="attachMenu"
+                             class="absolute bottom-full left-0 mb-2 w-64 rounded-2xl border border-gray-200 dark:border-[#333538] bg-white dark:bg-[#1e1f20] shadow-2xl p-1.5 opacity-0 invisible transition-all duration-200 ease-out transform translate-y-2 pointer-events-none"
+                             style="z-index: 9999;">
+                            <div class="space-y-0.5">
+                                {{-- Impor File --}}
+                                <button type="button"
+                                        id="menuUploadFile"
+                                        class="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#2c2d30] transition-colors group">
+                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-[#2a2c30] text-gray-600 dark:text-gray-300 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-950/50 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors shrink-0">
+                                        <i data-lucide="paperclip" class="h-4 w-4"></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-medium text-sm text-gray-900 dark:text-gray-100">Impor file</div>
+                                        <div class="text-[11px] text-gray-500 dark:text-gray-400 truncate">PDF, Word, TXT, Dokumen</div>
+                                    </div>
+                                </button>
+
+                                {{-- Foto --}}
+                                <button type="button"
+                                        id="menuUploadPhoto"
+                                        class="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#2c2d30] transition-colors group">
+                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-[#2a2c30] text-gray-600 dark:text-gray-300 group-hover:bg-blue-100 dark:group-hover:bg-blue-950/50 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors shrink-0">
+                                        <i data-lucide="image" class="h-4 w-4"></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-medium text-sm text-gray-900 dark:text-gray-100">Foto</div>
+                                        <div class="text-[11px] text-gray-500 dark:text-gray-400 truncate">PNG, JPG, WEBP, SVG</div>
+                                    </div>
+                                </button>
+
+                                {{-- Impor Kode --}}
+                                <button type="button"
+                                        id="menuUploadCode"
+                                        class="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-left text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-[#2c2d30] transition-colors group">
+                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-[#2a2c30] text-gray-600 dark:text-gray-300 group-hover:bg-purple-100 dark:group-hover:bg-purple-950/50 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors shrink-0">
+                                        <i data-lucide="code" class="h-4 w-4"></i>
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-medium text-sm text-gray-900 dark:text-gray-100">Impor kode</div>
+                                        <div class="text-[11px] text-gray-500 dark:text-gray-400 truncate">PHP, JS, Python, SQL, C++</div>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <div class="mt-1 pt-1.5 border-t border-gray-100 dark:border-[#282a2e] px-2.5 py-1 flex items-center justify-between text-[11px] text-gray-400">
+                                <span>Atau paste langsung (Ctrl+V)</span>
+                            </div>
+                        </div>
+                    </div>
 
                     <input type="text"
                            id="messageInput"
@@ -704,7 +755,8 @@
                 <div class="px-6 py-4">
                     <div id="statusLoading" class="text-center py-8">
                         <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-200 dark:border-[#2F3030] border-t-gray-900 dark:border-t-emerald-500"></div>
-                        <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">Memuat status...</p>
+                        <p class="mt-3 text-sm font-medium text-gray-700 dark:text-gray-200">Memeriksa status AI...</p>
+                        <p class="mt-1 text-xs text-gray-400">Proses ini mungkin membutuhkan waktu beberapa saat.</p>
                     </div>
                     <div id="statusContent" class="hidden">
                         <div class="space-y-2" id="statusList"></div>

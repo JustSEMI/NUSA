@@ -1,9 +1,8 @@
 @extends('layouts.app')
 
 @section('title', 'Pengaturan — NUSA')
+
 @section('content')
-{{-- Hidden safelist for Tailwind JIT --}}
-<div class="hidden dark:bg-emerald-500 dark:bg-[#3F4040]"></div>
 
 <div class="min-h-screen bg-gray-50 dark:bg-[#191A1A]">
     {{-- Header --}}
@@ -46,11 +45,10 @@
                         <p class="font-medium text-gray-900 dark:text-gray-100">Mode Gelap</p>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Gunakan tema gelap</p>
                     </div>
-                    <button id="darkModeToggle" 
-                            onclick="toggleDarkMode()"
-                            class="toggle-btn relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-gray-200 dark:bg-[#3F4040]">
-                        <span class="toggle-dot pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-0"></span>
-                    </button>
+                    <label class="nusa-toggle" aria-label="Toggle Mode Gelap">
+                        <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                        <span class="nusa-track"><span class="nusa-dot"></span></span>
+                    </label>
                 </div>
                 
                 {{-- Auto-save Chat --}}
@@ -59,11 +57,10 @@
                         <p class="font-medium text-gray-900 dark:text-gray-100">Auto-save Chat</p>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Simpan riwayat otomatis</p>
                     </div>
-                    <button id="autoSaveToggle" 
-                            onclick="toggleSetting('auto_save', this)"
-                            class="toggle-btn relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-gray-200 dark:bg-[#3F4040]">
-                        <span class="toggle-dot pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-0"></span>
-                    </button>
+                    <label class="nusa-toggle" aria-label="Toggle Auto-save Chat">
+                        <input type="checkbox" id="autoSaveToggle" onchange="toggleSetting('auto_save', this.checked)">
+                        <span class="nusa-track"><span class="nusa-dot"></span></span>
+                    </label>
                 </div>
                 
                 {{-- Streaming Response --}}
@@ -72,11 +69,10 @@
                         <p class="font-medium text-gray-900 dark:text-gray-100">Streaming Response</p>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Jawaban AI real-time</p>
                     </div>
-                    <button id="streamingToggle" 
-                            onclick="toggleSetting('streaming', this)"
-                            class="toggle-btn relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-gray-200 dark:bg-[#3F4040]">
-                        <span class="toggle-dot pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-0"></span>
-                    </button>
+                    <label class="nusa-toggle" aria-label="Toggle Streaming Response">
+                        <input type="checkbox" id="streamingToggle" onchange="toggleSetting('streaming', this.checked)">
+                        <span class="nusa-track"><span class="nusa-dot"></span></span>
+                    </label>
                 </div>
             </div>
         </div>
@@ -95,8 +91,10 @@
                             <option value="{{ $modelId }}">{{ $modelData['name'] }} ({{ $modelData['multiplier'] }})</option>
                         @endforeach
                     </select>
-                    <button id="saveModelBtn" onclick="saveDefaultModel(event)" 
-                            class="mt-3 w-full rounded-lg bg-gray-900 dark:bg-[#2F3030] border border-transparent dark:border-gray-600 px-4 py-2 text-sm font-medium text-white dark:text-gray-200 hover:bg-gray-800 dark:hover:bg-[#3a3b3b] transition">
+                    <button type="button"
+                            id="saveModelBtn" 
+                            onclick="saveDefaultModel(event)" 
+                            class="mt-3 w-full rounded-lg bg-gray-900 dark:bg-[#2F3030] border border-transparent dark:border-gray-600 px-4 py-2.5 text-sm font-medium text-white dark:text-gray-200 hover:bg-gray-800 dark:hover:bg-[#3a3b3b] transition">
                         Simpan
                     </button>
                 </div>
@@ -108,7 +106,8 @@
                             <p class="font-medium text-gray-900 dark:text-gray-100">Riwayat Chat</p>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Hapus semua riwayat</p>
                         </div>
-                        <button onclick="clearAllChatHistory()" 
+                        <button type="button"
+                                onclick="clearAllChatHistory()" 
                                 class="rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20 px-4 py-2 text-sm font-medium text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition">
                             Hapus Semua
                         </button>
@@ -128,7 +127,8 @@
                         <p class="font-medium text-gray-900 dark:text-gray-100">Export Data</p>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Download data JSON</p>
                     </div>
-                    <button onclick="exportAllData()" 
+                    <button type="button"
+                            onclick="exportAllData()" 
                             class="rounded-lg border border-gray-200 dark:border-[#2F3030] bg-white dark:bg-[#191A1A] px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2F3030] transition">
                         Export
                     </button>
@@ -140,7 +140,8 @@
         <div class="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30 rounded-lg p-6">
             <h3 class="font-semibold text-red-900 dark:text-red-400 mb-2">Zone Bahaya</h3>
             <p class="text-sm text-red-700 dark:text-red-300 mb-4">Tindakan ini bersifat permanen dan tidak dapat dibatalkan.</p>
-            <button onclick="showDeleteAccountModal()" 
+            <button type="button"
+                    onclick="showDeleteAccountModal()" 
                     class="rounded-lg bg-red-600 dark:bg-red-700/80 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 dark:hover:bg-red-600 transition border border-transparent dark:border-red-500/50">
                 Hapus Akun
             </button>
@@ -162,11 +163,13 @@
                    placeholder="Password"
                    class="w-full rounded-lg border border-gray-300 dark:border-[#2F3030] bg-white dark:bg-[#191A1A] px-4 py-2.5 text-sm mb-4 focus:border-red-500 dark:focus:border-red-400 focus:outline-none focus:ring-1 focus:ring-red-500 dark:focus:ring-red-400 dark:text-gray-100">
             <div class="flex gap-3">
-                <button onclick="hideDeleteAccountModal()" 
+                <button type="button"
+                        onclick="hideDeleteAccountModal()" 
                         class="flex-1 rounded-lg border border-gray-300 dark:border-[#2F3030] bg-white dark:bg-[#191A1A] px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2F3030] transition">
                     Batal
                 </button>
-                <button onclick="confirmDeleteAccount()" 
+                <button type="button"
+                        onclick="confirmDeleteAccount()" 
                         class="flex-1 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition">
                     Hapus
                 </button>
@@ -190,11 +193,13 @@
                 Semua riwayat chat bakal kehapus <strong class="text-red-600 dark:text-red-400">permanen</strong> dan gak bisa dibalikin. Yakin nih?
             </p>
             <div class="flex gap-3">
-                <button onclick="hideClearHistoryModal()" 
+                <button type="button"
+                        onclick="hideClearHistoryModal()" 
                         class="flex-1 rounded-lg border border-gray-300 dark:border-[#2F3030] bg-white dark:bg-[#191A1A] px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#2F3030] transition">
                     Batal
                 </button>
-                <button onclick="executeClearHistory()" 
+                <button type="button"
+                        onclick="executeClearHistory()" 
                         class="flex-1 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-700 transition">
                     Ya, Hapus Semua
                 </button>
@@ -205,98 +210,138 @@
 @endsection
 
 @section('scripts')
+{{-- Toggle CSS: uses native :checked so nothing can override the animation --}}
+<style>
+.nusa-toggle {
+    display: inline-flex !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    flex-shrink: 0 !important;
+    align-items: center !important;
+}
+.nusa-toggle input[type=checkbox] {
+    position: absolute !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    pointer-events: none !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+}
+.nusa-track {
+    display: flex !important;
+    align-items: center !important;
+    width: 44px !important;
+    height: 24px !important;
+    border-radius: 12px !important;
+    background: #9ca3af !important;
+    padding: 2px !important;
+    box-sizing: border-box !important;
+    transition: background 0.25s ease !important;
+    cursor: pointer !important;
+}
+.nusa-toggle input:checked + .nusa-track {
+    background: #10b981 !important;
+}
+.nusa-dot {
+    display: block !important;
+    width: 20px !important;
+    height: 20px !important;
+    min-width: 20px !important;
+    border-radius: 50% !important;
+    background: #ffffff !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.35) !important;
+    transform: translateX(0px) !important;
+    transition: transform 0.25s ease !important;
+    flex-shrink: 0 !important;
+    pointer-events: none !important;
+}
+.nusa-toggle input:checked + .nusa-track .nusa-dot {
+    transform: translateX(20px) !important;
+}
+</style>
 <script>
-// Load settings from localStorage
 const savedDarkMode = localStorage.getItem('nusa-dark-mode') === 'true' || localStorage.getItem('darkMode') === 'true';
 const savedSettings = JSON.parse(localStorage.getItem('nusaSettings') || localStorage.getItem('nusa-settings') || '{}');
 
-console.log('Loaded settings:', savedSettings);
-
-if (savedDarkMode) {
-    document.documentElement.classList.add('dark');
-    updateToggleVisual(document.getElementById('darkModeToggle'), true);
-}
-
-if (savedSettings.auto_save !== undefined) {
-    updateToggleVisual(document.getElementById('autoSaveToggle'), savedSettings.auto_save);
-} else {
-    // Default: auto_save = true
-    updateToggleVisual(document.getElementById('autoSaveToggle'), true);
-}
-
-if (savedSettings.streaming !== undefined) {
-    updateToggleVisual(document.getElementById('streamingToggle'), savedSettings.streaming);
-} else {
-    // Default: streaming = true
-    updateToggleVisual(document.getElementById('streamingToggle'), true);
-}
-
-// Model selector
-const modelSelect = document.getElementById('defaultModel');
-const savedModel = localStorage.getItem('nusa-default-model');
-if (savedModel && Array.from(modelSelect.options).some(opt => opt.value === savedModel)) {
-    modelSelect.value = savedModel;
-}
-
-function updateToggleVisual(toggle, enabled) {
-    if (!toggle) return;
-    
-    const dot = toggle.querySelector('.toggle-dot');
-    if (enabled) {
-        toggle.classList.remove('bg-gray-200', 'dark:bg-[#3F4040]');
-        toggle.classList.add('bg-gray-900', 'dark:bg-emerald-500');
-        dot.classList.remove('translate-x-0');
-        dot.classList.add('translate-x-5');
-    } else {
-        toggle.classList.remove('bg-gray-900', 'dark:bg-emerald-500');
-        toggle.classList.add('bg-gray-200', 'dark:bg-[#3F4040]');
-        dot.classList.remove('translate-x-5');
-        dot.classList.add('translate-x-0');
-    }
+function setToggle(id, enabled) {
+    const cb = document.getElementById(id);
+    if (cb) cb.checked = enabled;
 }
 
 function toggleDarkMode() {
     const isDark = document.documentElement.classList.toggle('dark');
     localStorage.setItem('nusa-dark-mode', isDark.toString());
     localStorage.setItem('darkMode', isDark.toString());
-    
-    const toggle = document.getElementById('darkModeToggle');
-    updateToggleVisual(toggle, isDark);
-    
-    console.log(`Dark mode: ${isDark}`);
 }
 
-function toggleSetting(key, toggleElement) {
-    const isChecked = toggleElement.classList.contains('bg-gray-900') || toggleElement.classList.contains('dark:bg-emerald-500');
-    const newValue = !isChecked;
-    
-    updateToggleVisual(toggleElement, newValue);
-    
-    // Merge dengan settings yang sudah ada
+function toggleSetting(key, enabled) {
     const currentSettings = JSON.parse(localStorage.getItem('nusaSettings') || '{}');
-    currentSettings[key] = newValue;
+    currentSettings[key] = enabled;
     localStorage.setItem('nusaSettings', JSON.stringify(currentSettings));
-    
-    console.log(`Saved ${key}: ${newValue}`);
 }
 
+// Initial state application on page load
+if (savedDarkMode) {
+    document.documentElement.classList.add('dark');
+    setToggle('darkModeToggle', true);
+} else {
+    document.documentElement.classList.remove('dark');
+    setToggle('darkModeToggle', false);
+}
+
+if (savedSettings.auto_save !== undefined) {
+    setToggle('autoSaveToggle', savedSettings.auto_save);
+} else {
+    setToggle('autoSaveToggle', true);
+}
+
+if (savedSettings.streaming !== undefined) {
+    setToggle('streamingToggle', savedSettings.streaming);
+} else {
+    setToggle('streamingToggle', true);
+}
+
+// Model Selection & Quick Save
+const modelSelect = document.getElementById('defaultModel');
+const savedModel = localStorage.getItem('nusa-default-model');
+if (modelSelect && savedModel && Array.from(modelSelect.options).some(opt => opt.value === savedModel)) {
+    modelSelect.value = savedModel;
+}
+
+let saveModelTimer = null;
 function saveDefaultModel(e) {
-    const model = modelSelect ? modelSelect.value : 'qwen-3.5-flash';
+    const model = modelSelect ? modelSelect.value : 'qwen-3.8-flash';
     localStorage.setItem('nusa-default-model', model);
     
-    const btn = (e && e.target) ? e.target : document.getElementById('saveModelBtn') || (window.event ? window.event.target : null);
+    const btn = document.getElementById('saveModelBtn');
     if (btn) {
-        const originalText = btn.textContent;
+        if (saveModelTimer) clearTimeout(saveModelTimer);
         btn.textContent = '✓ Tersimpan!';
-        btn.classList.add('bg-green-600', 'dark:bg-green-600', 'border-transparent');
-        btn.classList.remove('bg-gray-900', 'dark:bg-[#2F3030]', 'dark:border-gray-600');
+        btn.classList.add('bg-emerald-600', 'dark:bg-emerald-600');
+        btn.classList.remove('bg-gray-900', 'dark:bg-[#2F3030]');
         
-        setTimeout(() => {
-            btn.textContent = originalText;
-            btn.classList.remove('bg-green-600', 'dark:bg-green-600', 'border-transparent');
-            btn.classList.add('bg-gray-900', 'dark:bg-[#2F3030]', 'dark:border-gray-600');
-        }, 1500);
+        saveModelTimer = setTimeout(() => {
+            btn.textContent = 'Simpan';
+            btn.classList.remove('bg-emerald-600', 'dark:bg-emerald-600');
+            btn.classList.add('bg-gray-900', 'dark:bg-[#2F3030]');
+        }, 600);
     }
+}
+
+if (modelSelect) {
+    modelSelect.addEventListener('change', () => {
+        const btn = document.getElementById('saveModelBtn');
+        if (btn) {
+            if (saveModelTimer) clearTimeout(saveModelTimer);
+            btn.textContent = 'Simpan';
+            btn.classList.remove('bg-emerald-600', 'dark:bg-emerald-600');
+            btn.classList.add('bg-gray-900', 'dark:bg-[#2F3030]');
+        }
+    });
 }
 
 async function clearAllChatHistory() {
