@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function () {
 
     // New Chat Management APIs
     Route::put('/api/chat/session/{id}/rename', [ChatController::class, 'renameSession'])->name('chat.session.rename');
+    Route::put('/api/chat/session/{id}/pin', [ChatController::class, 'togglePinSession'])->name('chat.session.pin');
     Route::put('/api/chat/session/{id}/settings', [ChatController::class, 'updateSessionSettings'])->name('chat.session.settings.update');
     Route::get('/api/chat/session/{id}/settings', [ChatController::class, 'getSessionSettings'])->name('chat.session.settings.get');
     Route::delete('/api/chat/session/{id}/truncate/{index}', [ChatController::class, 'truncateMessages'])->name('chat.session.truncate');

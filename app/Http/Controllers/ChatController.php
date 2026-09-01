@@ -312,6 +312,20 @@ class ChatController extends Controller
     }
 
     /**
+     * Toggle pin status for a chat session.
+     */
+    public function togglePinSession(Request $request, int $id): JsonResponse
+    {
+        $toggled = $this->sessionService->togglePinSession($request->user()->id, $id);
+
+        if (!$toggled) {
+            return $this->notFoundResponse('Sesi chat tidak ditemukan.');
+        }
+
+        return $this->successResponse(null, 'Status pin berhasil diubah.');
+    }
+
+    /**
      * Rename chat session.
      */
     public function renameSession(Request $request, int $id): JsonResponse
