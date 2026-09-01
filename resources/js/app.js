@@ -690,6 +690,34 @@ class ApiService {
             return { success: false };
         }
     }
+    
+    async pinSession(id) {
+        try {
+            const response = await fetch(`/api/chat/session/${id}/pin`, {
+                method: "PUT",
+                headers: { "X-CSRF-TOKEN": this.csrfToken },
+            });
+            return await response.json();
+        } catch {
+            return { success: false };
+        }
+    }
+
+    async renameSession(id, title) {
+        try {
+            const response = await fetch(`/api/chat/session/${id}/rename`, {
+                method: "PUT",
+                headers: { 
+                    "X-CSRF-TOKEN": this.csrfToken,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ title })
+            });
+            return await response.json();
+        } catch {
+            return { success: false };
+        }
+    }
     async truncateMessages(id, index) {
         try {
             const response = await fetch(`/api/chat/session/${id}/truncate/${index}`, {
@@ -1543,24 +1571,144 @@ class ChatBot {
             return;
         }
 
-        list.innerHTML =
-            '<a href="#" class="block px-3 py-2 text-sm font-semibold uppercase tracking-wider text-gray-400 border-b border-gray-100 mb-2">Riwayat Chat</a>';
+        list.innerHTML = ""; // Clear existing
 
-        result.sessions.forEach((session) => {
-            const item = document.createElement("button");
-            item.className =
-                "chat-session-item w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#202222] transition text-sm truncate";
-            item.setAttribute("data-session-id", session.id);
-            item.setAttribute("data-title", session.title);
-            item.innerHTML = `
-                <div class="font-medium text-gray-700 dark:text-gray-300 truncate">${session.title}</div>
-                <div class="text-xs text-gray-400">${Utils.formatDate(session.created_at)}</div>
-            `;
-            item.addEventListener("click", (e) => {
-                e.preventDefault();
-                this.loadChatSession(session.id);
+        const pinnedSessions = result.sessions.filter(s => s.is_pinned);
+        const recentSessions = result.sessions.filter(s => !s.is_pinned);
+
+        const renderSection = (title, sessions) => {
+            if (sessions.length === 0) return;
+            
+            const sectionTitle = document.createElement("div");
+            sectionTitle.className = "px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1 mt-2";
+            sectionTitle.textContent = title;
+            list.appendChild(sectionTitle);
+
+            sessions.forEach((session) => {
+                const itemWrapper = document.createElement("div");
+                itemWrapper.className = "relative group chat-session-wrapper";
+                itemWrapper.setAttribute("data-session-id", session.id);
+
+                // Main clickable area
+                const mainBtn = document.createElement("button");
+                mainBtn.className = "chat-session-item w-full text-left px-3 py-2 pr-8 rounded-lg hover:bg-gray-100 dark:hover:bg-[#202222] transition text-sm flex flex-col justify-center";
+                mainBtn.title = session.title;
+                
+                const titleDiv = document.createElement("div");
+                titleDiv.className = "font-medium text-gray-700 dark:text-gray-300 truncate w-full session-title";
+                titleDiv.textContent = session.title;
+
+                const dateDiv = document.createElement("div");
+                dateDiv.className = "text-xs text-gray-400 truncate";
+                dateDiv.textContent = Utils.formatDate(session.updated_at || session.created_at);
+
+                mainBtn.appendChild(titleDiv);
+                mainBtn.appendChild(dateDiv);
+                
+                mainBtn.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    if (!itemWrapper.classList.contains("editing")) {
+                        this.loadChatSession(session.id);
+                    }
+                });
+
+                // Options Button (3-dots)
+                const optionsBtn = document.createElement("button");
+                optionsBtn.className = "absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-[#333538] opacity-0 group-hover:opacity-100 transition-opacity z-10 focus:opacity-100";
+                optionsBtn.innerHTML = '<i data-lucide="more-vertical" class="w-4 h-4"></i>';
+                
+                // Dropdown Menu
+                const dropdown = document.createElement("div");
+                dropdown.className = "absolute right-0 top-10 w-48 bg-white dark:bg-[#1e1f20] border border-gray-200 dark:border-[#333538] rounded-xl shadow-xl z-50 hidden flex-col py-1 text-sm overflow-hidden";
+                
+                const createMenuItem = (icon, text, onClick) => {
+                    const btn = document.createElement("button");
+                    btn.className = "w-full text-left px-4 py-2 flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-[#2c2d30] text-gray-700 dark:text-gray-200 transition-colors";
+                    btn.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4"></i> <span>${text}</span>`;
+                    btn.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        dropdown.classList.add("hidden");
+                        onClick();
+                    });
+                    return btn;
+                };
+
+                dropdown.appendChild(createMenuItem(session.is_pinned ? "pin-off" : "pin", session.is_pinned ? "Lepaskan sematan" : "Sematkan", async () => {
+                    await this.api.pinSession(session.id);
+                    this.loadChatHistory(); // reload to reorder
+                }));
+
+                dropdown.appendChild(createMenuItem("pencil", "Ganti nama", () => {
+                    itemWrapper.classList.add("editing");
+                    optionsBtn.classList.add("hidden"); // Sembunyikan titik 3 saat edit
+                    
+                    const input = document.createElement("input");
+                    input.type = "text";
+                    input.value = session.title;
+                    input.className = "w-full bg-transparent border-b-2 border-emerald-500 font-medium text-gray-900 dark:text-white outline-none px-0 py-0 m-0 leading-tight";
+                    
+                    const saveRename = async () => {
+                        const newTitle = input.value.trim();
+                        if (newTitle && newTitle !== session.title) {
+                            await this.api.renameSession(session.id, newTitle);
+                            titleDiv.textContent = newTitle;
+                            session.title = newTitle;
+                        }
+                        mainBtn.replaceChild(titleDiv, input);
+                        itemWrapper.classList.remove("editing");
+                        optionsBtn.classList.remove("hidden"); // Tampilkan kembali titik 3
+                    };
+
+                    input.addEventListener("blur", saveRename);
+                    input.addEventListener("keydown", (e) => {
+                        if (e.key === "Enter") saveRename();
+                        if (e.key === "Escape") {
+                            mainBtn.replaceChild(titleDiv, input);
+                            itemWrapper.classList.remove("editing");
+                            optionsBtn.classList.remove("hidden");
+                        }
+                    });
+
+                    mainBtn.replaceChild(input, titleDiv);
+                    input.focus();
+                    // Select all text when editing starts
+                    input.select();
+                }));
+
+                dropdown.appendChild(createMenuItem("trash-2", "Hapus", () => {
+                    this.deleteSession(session.id);
+                }));
+
+                optionsBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    // Close all other dropdowns
+                    document.querySelectorAll('.chat-session-wrapper .absolute.flex-col').forEach(el => {
+                        if (el !== dropdown) el.classList.add("hidden");
+                    });
+                    dropdown.classList.toggle("hidden");
+                });
+
+                itemWrapper.appendChild(mainBtn);
+                itemWrapper.appendChild(optionsBtn);
+                itemWrapper.appendChild(dropdown);
+                list.appendChild(itemWrapper);
             });
-            list.appendChild(item);
+        };
+
+        renderSection("Disematkan", pinnedSessions);
+        renderSection("Terbaru", recentSessions);
+
+        if (typeof lucide !== "undefined") {
+            lucide.createIcons();
+        }
+
+        // Close dropdowns on outside click
+        document.addEventListener("click", (e) => {
+            if (!e.target.closest('.chat-session-wrapper')) {
+                document.querySelectorAll('.chat-session-wrapper .absolute.flex-col').forEach(el => {
+                    el.classList.add("hidden");
+                });
+            }
         });
     }
 

@@ -216,7 +216,8 @@ class ChatSessionService
     public function getUserSessions(int $userId): array
     {
         return ChatSession::where('user_id', $userId)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('is_pinned', 'desc')
+            ->orderBy('updated_at', 'desc')
             ->get()
             ->toArray();
     }
@@ -263,6 +264,22 @@ class ChatSessionService
         }
 
         $session->delete();
+        return true;
+    }
+
+    /**
+     * Toggle pin status for a chat session.
+     */
+    public function togglePinSession(int $userId, int $sessionId): bool
+    {
+        $session = $this->findSessionByUser($userId, $sessionId);
+
+        if (!$session) {
+            return false;
+        }
+
+        $session->is_pinned = !$session->is_pinned;
+        $session->save();
         return true;
     }
 
