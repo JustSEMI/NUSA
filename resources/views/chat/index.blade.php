@@ -398,7 +398,12 @@
 
         {{-- History --}}
         <div class="flex-1 overflow-y-auto p-2" id="chatHistoryList">
-            <p class="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-gray-400 border-b border-gray-100 dark:border-[#2F3030] mb-2">Riwayat Chat</p>
+            <div class="px-2 mb-3 mt-1">
+                <div class="relative">
+                    <i data-lucide="search" class="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"></i>
+                    <input type="text" id="searchHistoryInput" placeholder="Cari percakapan..." class="w-full bg-gray-50 dark:bg-[#202222] border border-gray-200 dark:border-[#333538] rounded-md pl-8 pr-3 py-1.5 text-sm text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 placeholder-gray-400 transition-colors">
+                </div>
+            </div>
             <div id="chatHistoryContainer" class="space-y-1">
                 {{-- Chat history akan dimuat di sini dari backend --}}
                 <div class="text-center py-8 text-xs text-gray-400">

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\AIStatusController;
@@ -7,18 +8,18 @@ use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return auth()->check()
-        ? redirect()->route('chat')
-        : redirect()->route('login');
+    if (auth()->check()) {
+        return auth()->user()->isAdmin()
+            ? redirect()->route('admin.dashboard')
+            : redirect()->route('chat');
+    }
+    return redirect()->route('login');
 });
 
 // Auth
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
-
-    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])
@@ -65,4 +66,22 @@ Route::middleware('auth')->group(function () {
     Route::put('/api/settings/preferences', [SettingsController::class, 'updatePreferences'])->name('settings.preferences.update-batch');
     Route::delete('/api/settings/preferences/{key}', [SettingsController::class, 'deletePreference'])->name('settings.preferences.delete');
     Route::post('/api/settings/delete-account', [SettingsController::class, 'deleteAccount'])->name('settings.delete-account');
+});
+
+// ─────────────────────────── ADMIN PANEL ────────────────────────────────────
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
+
+    // User Management
+    Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/users/create', [AdminController::class, 'createUser'])->name('users.create');
+    Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
+    Route::get('/users/{user}/edit', [AdminController::class, 'editUser'])->name('users.edit');
+    Route::put('/users/{user}', [AdminController::class, 'updateUser'])->name('users.update');
+    Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('users.delete');
+    Route::patch('/users/{user}/toggle-admin', [AdminController::class, 'toggleAdmin'])->name('users.toggle-admin');
+
+    // Session Management
+    Route::get('/sessions', [AdminController::class, 'sessions'])->name('sessions');
+    Route::delete('/sessions/{session}', [AdminController::class, 'deleteSession'])->name('sessions.delete');
 });

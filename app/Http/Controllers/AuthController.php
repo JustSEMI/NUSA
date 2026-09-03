@@ -42,6 +42,11 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
+        // Admin langsung ke dashboard admin
+        if (Auth::user()->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        }
+
         return redirect()->route('chat');
     }
 

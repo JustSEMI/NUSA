@@ -93,13 +93,7 @@
                 </button>
             </form>
 
-            {{-- Switch to Register --}}
-            <div class="mt-6 text-center text-sm text-gray-600">
-                Belum punya akun?
-                <a href="{{ route('register') }}" class="font-medium text-black hover:underline">
-                    Daftar sekarang
-                </a>
-            </div>
+
         </div>
 
         {{-- Footer --}}

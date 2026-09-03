@@ -876,6 +876,20 @@ class ChatBot {
         this.setupThinkingEffortDropdown();
         await this.loadChatHistory();
         
+        // Setup Search History Listener
+        const searchInput = document.getElementById("searchHistoryInput");
+        if (searchInput) {
+            searchInput.addEventListener("input", (e) => {
+                const term = e.target.value.toLowerCase();
+                if (!this.state.sessions) return;
+                
+                const filtered = this.state.sessions.filter(s => 
+                    s.title.toLowerCase().includes(term)
+                );
+                this.renderFilteredHistory(filtered);
+            });
+        }
+
         this.applyDarkMode();
         window.chatBot = this;
     }
@@ -1556,25 +1570,46 @@ class ChatBot {
         const list = this.ui.get("chatHistoryList");
         const container = this.ui.get("chatHistoryContainer");
 
-        if (!list) return;
+        if (!container) return;
 
         if (!result.sessions || result.sessions.length === 0) {
-            if (container) {
-                container.innerHTML = `
-                    <div class="text-center py-8 text-xs text-gray-400">
-                        <i data-lucide="message-square" class="h-6 w-6 mx-auto mb-2 opacity-50"></i>
-                        <p>Belum ada riwayat chat</p>
-                    </div>
-                `;
-                if (typeof lucide !== "undefined") lucide.createIcons();
-            }
+            container.innerHTML = `
+                <div class="text-center py-8 text-xs text-gray-400">
+                    <i data-lucide="message-square" class="h-6 w-6 mx-auto mb-2 opacity-50"></i>
+                    <p>Belum ada riwayat chat</p>
+                </div>
+            `;
+            if (typeof lucide !== "undefined") lucide.createIcons();
             return;
         }
 
-        list.innerHTML = ""; // Clear existing
+        container.innerHTML = ""; // Clear existing
 
-        const pinnedSessions = result.sessions.filter(s => s.is_pinned);
-        const recentSessions = result.sessions.filter(s => !s.is_pinned);
+        // Save original sessions to state for search filtering
+        this.state.sessions = result.sessions;
+
+        this.renderFilteredHistory(result.sessions);
+    }
+
+    renderFilteredHistory(sessionsToRender) {
+        const container = this.ui.get("chatHistoryContainer");
+        if (!container) return;
+        
+        container.innerHTML = "";
+        
+        if (!sessionsToRender || sessionsToRender.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-8 text-xs text-gray-400">
+                    <i data-lucide="search-x" class="h-6 w-6 mx-auto mb-2 opacity-50"></i>
+                    <p>Pencarian tidak ditemukan</p>
+                </div>
+            `;
+            if (typeof lucide !== "undefined") lucide.createIcons();
+            return;
+        }
+
+        const pinnedSessions = sessionsToRender.filter(s => s.is_pinned);
+        const recentSessions = sessionsToRender.filter(s => !s.is_pinned);
 
         const renderSection = (title, sessions) => {
             if (sessions.length === 0) return;
@@ -1582,7 +1617,7 @@ class ChatBot {
             const sectionTitle = document.createElement("div");
             sectionTitle.className = "px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1 mt-2";
             sectionTitle.textContent = title;
-            list.appendChild(sectionTitle);
+            container.appendChild(sectionTitle);
 
             sessions.forEach((session) => {
                 const itemWrapper = document.createElement("div");
@@ -1653,6 +1688,9 @@ class ChatBot {
                             await this.api.renameSession(session.id, newTitle);
                             titleDiv.textContent = newTitle;
                             session.title = newTitle;
+                            // Update internal state title so search still works correctly
+                            const sessionInState = this.state.sessions.find(s => s.id === session.id);
+                            if (sessionInState) sessionInState.title = newTitle;
                         }
                         mainBtn.replaceChild(titleDiv, input);
                         itemWrapper.classList.remove("editing");
@@ -1671,7 +1709,6 @@ class ChatBot {
 
                     mainBtn.replaceChild(input, titleDiv);
                     input.focus();
-                    // Select all text when editing starts
                     input.select();
                 }));
 
@@ -1691,7 +1728,7 @@ class ChatBot {
                 itemWrapper.appendChild(mainBtn);
                 itemWrapper.appendChild(optionsBtn);
                 itemWrapper.appendChild(dropdown);
-                list.appendChild(itemWrapper);
+                container.appendChild(itemWrapper);
             });
         };
 
